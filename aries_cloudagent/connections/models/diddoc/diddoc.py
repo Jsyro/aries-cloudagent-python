@@ -24,7 +24,7 @@ import logging
 from typing import List, Sequence, Union
 from uuid import uuid4
 
-from .publickey import PublicKey, PublicKeyType
+from . import PublicKey, PublicKeyType
 from .service import Service
 from .util import canon_did, canon_ref, ok_did, resource
 
@@ -495,13 +495,13 @@ class DIDPeerDoc:
         for tag in [tags] if isinstance(tags, str) else list(tags):
             for svc_key in service.get(tag, {}):
                 pubkey = None
-                if tag is "recipientKeys":
+                if tag == "recipientKeys":
                     pubkey = PublicKey(
                         did=self.did,
                         ident=svc_key[-9:-1],  # industrial-grade uniqueness
                         value=svc_key,
                     )
-                elif tag is "routingKeys":
+                elif tag == "routingKeys":
                     pk_b58 = (
                         DIDKey.from_fingerprint(svc_key.split("#"[1]))
                     ).public_key_b58

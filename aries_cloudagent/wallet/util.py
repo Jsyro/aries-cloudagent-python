@@ -10,7 +10,7 @@ import math
 from collections import namedtuple
 from io import BytesIO
 from typing import List, Sequence, Optional
-import wallet.constant as constant
+from . import constant
 
 from ..core.profile import Profile
 

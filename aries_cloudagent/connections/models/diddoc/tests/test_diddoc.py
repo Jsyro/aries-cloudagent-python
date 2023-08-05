@@ -20,9 +20,9 @@ import json
 
 from asynctest import TestCase as AsyncTestCase, mock as async_mock
 
-from .. import DIDDoc, PublicKey, PublicKeyType, Service
+from .. import PublicKey, PublicKeyType, Service
 from ..util import canon_did, canon_ref
-
+from ..pydiddoc import PYDIDDoc as DIDDoc
 
 class TestDIDDoc(AsyncTestCase):
     async def test_basic(self):
@@ -60,13 +60,13 @@ class TestDIDDoc(AsyncTestCase):
                 {
                     "id": "0",
                     "type": "Agency",
-                    "serviceEndpoint": "did:sov:Q4zqM7aXqm7gDQkUVLng9h",
+                    "serviceEndpoint": "did:sov:Q4zqM7aXqm7gDQkUVLng9h#0",
                 }
             ],
         }
 
         dd = DIDDoc.deserialize(dd_in)
-        assert str(dd) == f"DIDDoc({canon_did(dd_in['id'])})"
+        assert dd.id == dd_in['id']
         assert len(dd.pubkey) == len(dd_in["publicKey"])
         assert len(dd.authnkey) == len(dd_in["authentication"])
 

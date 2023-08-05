@@ -21,97 +21,47 @@ limitations under the License.
 import json
 import logging
 
-from typing import List, Sequence, Union
+from typing import List, Sequence, Union, Dict
 
 from .publickey import PublicKey, PublicKeyType
 from .service import Service
 from .util import canon_did, canon_ref, ok_did, resource
+from .acapydiddoc import ACAPYDIDDoc
 
 LOGGER = logging.getLogger(__name__)
 
 
-class DIDDoc:
+class DIDDoc(ACAPYDIDDoc):
     """
-    DID document, grouping a DID with verification keys and services.
-
-    Retains DIDs as raw values (orientated toward indy-facing operations),
-    everything else as URIs (oriented toward W3C-facing operations).
+        HERE TO PRESERVE OLD BEHAVIOUR, WOULD LIKE TO BE USING pydid.DIDDocument class
     """
-
-    CONTEXT = "https://w3id.org/did/v1"
 
     def __init__(self, did: str = None) -> None:
-        """
-        Initialize the DIDDoc instance.
-
-        Retain DID ('id' in DIDDoc context); initialize verification keys
-        and services to empty lists.
-
-        Args:
-            did: DID for current DIDdoc
-
-        Raises:
-            ValueError: for bad input DID.
-
-        """
-
         self._did = canon_did(did) if did else None  # allow specification post-hoc
-        self._pubkey = {}
         self._service = {}
+        self._pubkey ={}
 
     @property
     def did(self) -> str:
-        """Accessor for DID."""
-
         return self._did
 
     @did.setter
     def did(self, value: str) -> None:
-        """
-        Set DID ('id' in DIDDoc context).
-
-        Args:
-            value: DID
-
-        Raises:
-            ValueError: for bad input DID.
-
-        """
-
         self._did = canon_did(value) if value else None
 
     @property
     def pubkey(self) -> dict:
-        """Accessor for public keys by identifier."""
-
         return self._pubkey
 
     @property
     def authnkey(self) -> dict:
-        """Accessor for public keys marked as authentication keys, by identifier."""
-
         return {k: self._pubkey[k] for k in self._pubkey if self._pubkey[k].authn}
 
     @property
     def service(self) -> dict:
-        """Accessor for services by identifier."""
-
         return self._service
 
     def set(self, item: Union[Service, PublicKey]) -> "DIDDoc":
-        """
-        Add or replace service or public key; return current DIDDoc.
-
-        Raises:
-            ValueError: if input item is neither service nor public key.
-
-        Args:
-            item: service or public key to set
-
-        Returns: the current DIDDoc
-
-        """
-
         if isinstance(item, Service):
             self.service[item.id] = item
         elif isinstance(item, PublicKey):
@@ -122,13 +72,6 @@ class DIDDoc:
             )
 
     def serialize(self) -> dict:
-        """
-        Dump current object to a JSON-compatible dictionary.
-
-        Returns:
-            dict representation of current DIDDoc
-
-        """
 
         return {
             "@context": DIDDoc.CONTEXT,
@@ -146,33 +89,12 @@ class DIDDoc:
         }
 
     def to_json(self) -> str:
-        """
-        Dump current object as json (JSON-LD).
-
-        Returns:
-            json representation of current DIDDoc
-
-        """
 
         return json.dumps(self.serialize())
 
     def add_service_pubkeys(
         self, service: dict, tags: Union[Sequence[str], str]
     ) -> List[PublicKey]:
-        """
-        Add public keys specified in service. Return public keys so discovered.
-
-        Args:
-            service: service from DID document
-            tags: potential tags marking public keys of type of interest
-                (the standard is still coalescing)
-
-        Raises:
-            ValueError: for public key reference not present in DID document.
-
-        Returns: list of public keys from the document service specification
-
-        """
 
         rv = []
         for tag in [tags] if isinstance(tags, str) else list(tags):
@@ -214,18 +136,6 @@ class DIDDoc:
 
     @classmethod
     def deserialize(cls, did_doc: dict) -> "DIDDoc":
-        """
-        Construct DIDDoc object from dict representation.
-
-        Args:
-            did_doc: DIDDoc dict representation
-
-        Raises:
-            ValueError: for bad DID or missing mandatory item.
-
-        Returns: DIDDoc from input json
-
-        """
 
         rv = None
         if "id" in did_doc:
@@ -304,16 +214,6 @@ class DIDDoc:
 
     @classmethod
     def from_json(cls, did_doc_json: str) -> "DIDDoc":
-        """
-        Construct DIDDoc object from json representation.
-
-        Args:
-            did_doc_json: DIDDoc json representation
-
-        Returns: DIDDoc from input json
-
-        """
-
         return cls.deserialize(json.loads(did_doc_json))
 
     def __str__(self) -> str:

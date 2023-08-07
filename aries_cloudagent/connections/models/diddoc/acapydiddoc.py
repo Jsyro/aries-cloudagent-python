@@ -43,21 +43,21 @@ class ACAPYDIDDoc(Protocol):
         """
         pass
 
-    @property
-    def pubkey(self) -> dict:
-        """Accessor for public keys by identifier."""
-        pass
+    # @property
+    # def pubkey(self) -> dict:
+    #     """Accessor for public keys by identifier."""
+    #     pass
 
-    @property
-    def authnkey(self) -> dict:
-        """Accessor for public keys marked as authentication keys, by identifier."""
-        #return {k: self._pubkey[k] for k in self._pubkey if self._pubkey[k].authn}
-        pass
+    # @property
+    # def authnkey(self) -> dict:
+    #     """Accessor for public keys marked as authentication keys, by identifier."""
+    #     #return {k: self._pubkey[k] for k in self._pubkey if self._pubkey[k].authn}
+    #     pass
 
-    @property
-    def service(self) -> dict:
-        """Accessor for services by identifier."""
-        pass
+    # @property
+    # def service(self) -> dict:
+    #     """Accessor for services by identifier."""
+    #     pass
 
     def set(self, item: Union[Service, PublicKey]) -> "ACAPYDIDDoc":
         """

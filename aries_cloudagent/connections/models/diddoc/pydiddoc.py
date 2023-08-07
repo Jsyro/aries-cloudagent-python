@@ -1,11 +1,12 @@
 import json
 import logging
 
-from typing import List, Sequence, Union
+from typing import List, Sequence, Union, Dict
 from peerdid import DIDDocument
 from pydid import DID, DIDUrl
 from pydid.doc.doc import PossibleMethodTypes
-
+from pydantic_computed import Computed, computed
+from pydantic import Field
 from .publickey import PublicKey, PublicKeyType
 from .service import Service
 from .util import canon_did, canon_ref, ok_did, resource
@@ -18,34 +19,26 @@ class FinalMeta(type(DIDDocument), type(ACAPYDIDDoc)):
 
 class PYDIDDoc(DIDDocument, ACAPYDIDDoc, metaclass=FinalMeta):
 
+
     @property
     def did(self) -> str:
         return self.id
 
-    @did.setter
-    def did(self, value: str) -> None:
-        if DID.is_valid(value):
-            self.id = value
-        else:
-            raise ValueError("NOT A VALID DID")
-
     @property
     def pubkey(self) -> dict:
         return {vm.id : vm for vm in self.verification_method or {}}
-
+   
     @property
     def authnkey(self) -> dict:
         auth_list = []
-        vm_list = self.authentication
-        for v in vm_list:
+        for v in self.authentication:
             if DIDUrl.is_valid(v):
-                auth_list.append(self.dereference(v))
+                auth_list.append(self.dereference(DIDUrl(v)))
             elif isinstance(v,PossibleMethodTypes):
                 auth_list.append(v)
 
         return {vm.id : vm for vm in auth_list}
         
-
     @property
     def service(self) -> dict:
         """Accessor for services by identifier."""
@@ -103,12 +96,16 @@ class PYDIDDoc(DIDDocument, ACAPYDIDDoc, metaclass=FinalMeta):
             svc["id"] = str_to_didurl(svc["id"])  
     
         did_doc["authentication"] = new_auth            
+
         did_doc["verification_method"] = did_doc.get("publicKey",[])
 
-        dd = super().deserialize(did_doc)
-        rv = PYDIDDoc(**dd.dict())
+        if "publicKey" in did_doc:
+            del did_doc["publicKey"]
 
-        return rv
+        dd = super().deserialize(did_doc)
+        my_obj = cls.make(**dd.dict())
+
+        return my_obj
 
 
     @classmethod

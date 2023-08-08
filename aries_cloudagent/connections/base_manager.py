@@ -116,11 +116,11 @@ class BaseConnectionManager:
                     f"Router connection not completed: {router_id}"
                 )
             routing_doc, _ = await self.fetch_did_document(router.their_did)
-            if not routing_doc.service:
+            if not routing_doc.service_dict:
                 raise BaseConnectionManagerError(
                     f"No services defined by routing DIDDoc: {router_id}"
                 )
-            for service in routing_doc.service.values():
+            for service in routing_doc.service_dict.values():
                 if not service.endpoint:
                     raise BaseConnectionManagerError(
                         "Routing DIDDoc service has no service endpoint"
@@ -443,11 +443,11 @@ class BaseConnectionManager:
             raise BaseConnectionManagerError("No DIDDoc provided for connection target")
         if not doc.did:
             raise BaseConnectionManagerError("DIDDoc has no DID")
-        if not doc.service:
+        if not doc.service_dict:
             raise BaseConnectionManagerError("No services defined by DIDDoc")
 
         targets = []
-        for service in doc.service.values():
+        for service in doc.service_dict.values():
             if service.recip_keys:
                 targets.append(
                     ConnectionTarget(

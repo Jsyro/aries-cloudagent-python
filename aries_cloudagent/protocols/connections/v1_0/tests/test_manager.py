@@ -1835,8 +1835,8 @@ class TestConnectionManager(AsyncTestCase):
         doc = await self.manager.create_did_document(
             did_info, mediation_records=[mediation_record]
         )
-        assert doc.service
-        services = list(doc.service.values())
+        assert doc.service_dict
+        services = list(doc.service_dict.values())
         assert len(services) == 1
         (service,) = services
         service_public_keys = service.routing_keys[0]
@@ -1868,8 +1868,8 @@ class TestConnectionManager(AsyncTestCase):
         doc = await self.manager.create_did_document(
             did_info, mediation_records=[mediation_record1, mediation_record2]
         )
-        assert doc.service
-        services = list(doc.service.values())
+        assert doc.service_dict
+        services = list(doc.service_dict.values())
         assert len(services) == 1
         (service,) = services
         assert service.routing_keys[0].value == mediation_record1.routing_keys[0]
@@ -1896,8 +1896,8 @@ class TestConnectionManager(AsyncTestCase):
             svc_endpoints=[self.test_endpoint],
             mediation_records=[mediation_record],
         )
-        assert doc.service
-        services = list(doc.service.values())
+        assert doc.service_dict
+        services = list(doc.service_dict.values())
         assert len(services) == 1
         (service,) = services
         service_public_keys = service.routing_keys[0]

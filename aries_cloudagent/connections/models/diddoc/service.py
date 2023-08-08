@@ -85,9 +85,9 @@ class Service:
     @property
     def did(self) -> str:
         """Accessor for the DID value."""
-
-        return self._did
-
+        raise ValueError("SHOULD NOT EXIST")
+    
+    
     @property
     def id(self) -> str:
         """Accessor for the service identifier."""

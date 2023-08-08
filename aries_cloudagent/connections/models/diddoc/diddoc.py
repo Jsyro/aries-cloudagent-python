@@ -58,12 +58,12 @@ class DIDDoc(ACAPYDIDDoc):
         return {k: self._pubkey[k] for k in self._pubkey if self._pubkey[k].authn}
 
     @property
-    def service(self) -> dict:
+    def service_dict(self) -> dict:
         return self._service
 
     def set(self, item: Union[Service, PublicKey]) -> "DIDDoc":
         if isinstance(item, Service):
-            self.service[item.id] = item
+            self.service_dict[item.id] = item
         elif isinstance(item, PublicKey):
             self.pubkey[item.id] = item
         else:
@@ -85,7 +85,7 @@ class DIDDoc(ACAPYDIDDoc):
                 for pubkey in self.pubkey.values()
                 if pubkey.authn
             ],
-            "service": [service.to_dict() for service in self.service.values()],
+            "service": [service.to_dict() for service in self.service_dict.values()],
         }
 
     def to_json(self) -> str:
@@ -199,7 +199,7 @@ class DIDDoc(ACAPYDIDDoc):
                 service.get(
                     "id",
                     canon_ref(
-                        rv.did, "assigned-service-{}".format(len(rv.service)), ";"
+                        rv.did, "assigned-service-{}".format(len(rv.service_dict)), ";"
                     ),
                 ),
                 service["type"],
@@ -208,7 +208,7 @@ class DIDDoc(ACAPYDIDDoc):
                 canon_ref(rv.did, endpoint, ";") if ";" in endpoint else endpoint,
                 service.get("priority", None),
             )
-            rv.service[svc.id] = svc
+            rv.service_dict[svc.id] = svc
 
         return rv
 
